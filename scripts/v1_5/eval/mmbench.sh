@@ -1,0 +1,23 @@
+#!/bin/bash
+
+SPLIT="mmbench_dev_20230712"
+
+CKPT="llava-v1.5-divt0.65-7b"
+THRESHOLD=0.65
+
+python -m llava.eval.model_vqa_mmbench \
+    --model-path $CKPT \
+    --question-file ./playground/data/eval/mmbench/$SPLIT.tsv \
+    --answers-file ./playground/data/eval/mmbench/answers/$SPLIT/${CKPT}.jsonl \
+    --single-pred-prompt \
+    --temperature 0 \
+    --threshold $THRESHOLD \
+    --conv-mode vicuna_v1
+
+mkdir -p playground/data/eval/mmbench/answers_upload/$SPLIT
+
+python scripts/convert_mmbench_for_submission.py \
+    --annotation-file ./playground/data/eval/mmbench/$SPLIT.tsv \
+    --result-dir ./playground/data/eval/mmbench/answers/$SPLIT \
+    --upload-dir ./playground/data/eval/mmbench/answers_upload/$SPLIT \
+    --experiment ${CKPT}
